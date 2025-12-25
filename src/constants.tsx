@@ -1,5 +1,5 @@
-import React from 'react';
-import { TransformationOption, TransformationType } from './types';
+import { TransformationType } from './types';
+import type { TransformationOption } from './types';
 
 export const TRANSFORMATION_OPTIONS: TransformationOption[] = [
     {

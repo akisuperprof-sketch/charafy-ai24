@@ -12,11 +12,11 @@ export const generateCharacterImage = async (
     mimeType: string,
     prompt: string
 ): Promise<string> => {
-    // Use VITE_API_KEY for Vite environment
-    const apiKey = import.meta.env.VITE_API_KEY;
+    // Use VITE_API_KEY for Vite environment or GEMINI_API_KEY from Vercel env
+    const apiKey = import.meta.env.VITE_API_KEY || (import.meta.env.GEMINI_API_KEY as string);
 
     if (!apiKey) {
-        throw new Error("API_KEY is missing. Please set VITE_API_KEY in your .env file.");
+        throw new Error("API_KEY is missing. Please set VITE_API_KEY in your .env file or GEMINI_API_KEY in Vercel settings.");
     }
     const ai = new GoogleGenAI({ apiKey: apiKey });
 
@@ -46,14 +46,17 @@ export const generateCharacterImage = async (
             });
 
             if (response.candidates && response.candidates.length > 0) {
-                if (response.candidates?.[0]?.finishReason === 'SAFETY') {
+                const candidate = response.candidates[0];
+                if (candidate?.finishReason === 'SAFETY') {
                     throw new Error(`Safety filter triggered for model ${modelName}.`);
                 }
 
-                for (const part of response.candidates[0].content.parts) {
-                    if (part.inlineData) {
-                        console.log(`Successfully generated image with model: ${modelName}`);
-                        return part.inlineData.data;
+                if (candidate?.content?.parts) {
+                    for (const part of candidate.content.parts) {
+                        if (part.inlineData && part.inlineData.data) {
+                            console.log(`Successfully generated image with model: ${modelName}`);
+                            return part.inlineData.data;
+                        }
                     }
                 }
             }
