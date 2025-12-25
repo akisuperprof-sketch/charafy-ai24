@@ -16,6 +16,7 @@ const App: React.FC = () => {
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [userPrompt, setUserPrompt] = useState<string>('');
 
   const handleImageUpload = (file: File) => {
     setSelectedFile(file);
@@ -33,6 +34,7 @@ const App: React.FC = () => {
     setSourceImageUrl(null);
     setGeneratedImages([]);
     setError(null);
+    setUserPrompt('');
   };
 
   const handleOptionSelect = (id: TransformationType) => {
@@ -54,10 +56,14 @@ const App: React.FC = () => {
       const base64Data = sourceImageUrl.split(',')[1];
       const mimeType = selectedFile.type;
 
+      const fullPrompt = userPrompt.trim()
+        ? `${option.prompt}\n\nAdditional user instructions: ${userPrompt}`
+        : option.prompt;
+
       const generatedImageBase64 = await generateCharacterImage(
         base64Data,
         mimeType,
-        option.prompt
+        fullPrompt
       );
 
       setGeneratedImages([generatedImageBase64]);
@@ -88,6 +94,17 @@ const App: React.FC = () => {
                 <OptionsPanel
                   selectedOptionId={selectedOptionId}
                   onOptionSelect={handleOptionSelect}
+                />
+              </section>
+
+              <section className="px-6 animate-fade-in-up">
+                <div className="text-center mb-2 text-slate-600 font-medium text-sm">表情やポーズを追加 (任意)</div>
+                <input
+                  type="text"
+                  value={userPrompt}
+                  onChange={(e) => setUserPrompt(e.target.value)}
+                  placeholder="9種類9分割で"
+                  className="w-full bg-slate-700 text-white rounded-full px-6 py-3 text-center placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-inner"
                 />
               </section>
 
