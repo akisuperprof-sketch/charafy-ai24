@@ -17,3 +17,11 @@ export interface TransformationOption {
     icon: React.ReactNode;
     prompt: string;
 }
+
+export interface HistoryItem {
+    id: string;
+    timestamp: number;
+    imageBase64: string;
+    prompt: string;
+    optionId: TransformationType;
+}
